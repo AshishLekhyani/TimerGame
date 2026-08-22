@@ -1,0 +1,262 @@
+/* ============================================================
+   PULSE ARCADE — tokens, reset, backdrop
+   ============================================================ */
+
+:root {
+  /* surface ramp */
+  --bg-0: #07070f;
+  --bg-1: #0b0b18;
+  --bg-2: #101024;
+  --glass: rgba(255, 255, 255, 0.045);
+  --glass-strong: rgba(255, 255, 255, 0.075);
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* text */
+  --ink: #eef0fb;
+  --ink-dim: #a6abc8;
+  --ink-faint: #6b7091;
+
+  /* accents */
+  --cyan: #22e3d6;
+  --lime: #a3e635;
+  --magenta: #f0499b;
+  --violet: #a78bfa;
+  --amber: #fbbf24;
+  --danger: #ff5470;
+
+  /* current-screen accent, overridden per game */
+  --accent: #22e3d6;
+  --accent-soft: rgba(34, 227, 214, 0.14);
+  --accent-glow: rgba(34, 227, 214, 0.42);
+
+  /* type */
+  --font-ui: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-num: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* geometry */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  /* `clip` rather than `hidden`: hidden turns the element into a scroll
+     container, which breaks `position: sticky` on the top bar in Safari.
+     `clip` cuts the overflow without creating one. `hidden` stays first as a
+     fallback for browsers that do not know `clip`. */
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-0);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Nothing decorative may ever widen the page. */
+.backdrop {
+  contain: strict;
+}
+
+/* Long words, long numbers and long answers all wrap rather than push. */
+p,
+h1,
+h2,
+h3,
+button,
+li,
+span {
+  overflow-wrap: break-word;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent);
+  color: #06060d;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+  border: 3px solid var(--bg-0);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Animated backdrop
+   ============================================================ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, var(--bg-2) 0%, var(--bg-0) 62%);
+}
+
+.backdrop__grid {
+  position: absolute;
+  inset: -20%;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(80% 60% at 50% 35%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(80% 60% at 50% 35%, #000 0%, transparent 78%);
+  animation: gridDrift 42s linear infinite;
+}
+
+@keyframes gridDrift {
+  to {
+    transform: translate3d(64px, 64px, 0);
+  }
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.4;
+  will-change: transform;
+}
+
+.orb--a {
+  width: 46vw;
+  height: 46vw;
+  min-width: 340px;
+  min-height: 340px;
+  top: -14vw;
+  left: -8vw;
+  background: var(--accent);
+  animation: float1 24s var(--ease-out) infinite alternate;
+  transition: background 900ms ease;
+}
+
+.orb--b {
+  width: 38vw;
+  height: 38vw;
+  min-width: 280px;
+  min-height: 280px;
+  top: 18vh;
+  right: -10vw;
+  background: #6d4bff;
+  animation: float2 30s var(--ease-out) infinite alternate;
+}
+
+.orb--c {
+  width: 30vw;
+  height: 30vw;
+  min-width: 240px;
+  min-height: 240px;
+  bottom: -12vh;
+  left: 32vw;
+  background: var(--magenta);
+  opacity: 0.22;
+  animation: float3 34s var(--ease-out) infinite alternate;
+}
+
+@keyframes float1 {
+  to {
+    transform: translate3d(12vw, 8vh, 0) scale(1.18);
+  }
+}
+@keyframes float2 {
+  to {
+    transform: translate3d(-10vw, 12vh, 0) scale(0.85);
+  }
+}
+@keyframes float3 {
+  to {
+    transform: translate3d(8vw, -10vh, 0) scale(1.25);
+  }
+}
+
+.backdrop__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(100% 80% at 50% 50%, transparent 40%, rgba(4, 4, 10, 0.72) 100%);
+}
+
+.backdrop__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
