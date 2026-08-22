@@ -1,0 +1,162 @@
+/* ============================================================
+   VECTOR RUN / TRAPDOOR
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Vector Run — canvas runner
+   ------------------------------------------------------------ */
+
+.runwrap {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The canvas fills the stage completely; the game derives its world size from
+   the canvas, so there is no letterboxing and nothing is ever cropped.
+
+   Positioned absolutely rather than sized with height:100%. A percentage height
+   on a replaced element does not always resolve against a grid/flex parent, and
+   when it silently fell back to `auto` the canvas took its intrinsic 2:1 ratio
+   and grew *taller than the stage* — so the bottom of the world, where the
+   runner stands, was clipped away by the stage's overflow:hidden. */
+.runcanvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.runhud {
+  position: absolute;
+  top: 2.2rem;
+  left: 1.1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.runhud__dist {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+}
+
+.runhud__mult {
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 800;
+  animation: comboPop 300ms var(--ease-spring);
+}
+
+.runhint {
+  position: absolute;
+  bottom: 0.75rem;
+  inset-inline: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Trapdoor — the shaft
+   ------------------------------------------------------------ */
+
+.tower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(500px, 100%);
+  margin-top: 1.25rem;
+}
+
+.tower__pot {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+  border-radius: 99px;
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
+}
+
+.tower__potlabel {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.tower__potvalue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.tower__bank {
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+}
+
+/* ---- the shaft is a pixel canvas ---- */
+
+.shaftcanvas {
+  display: block;
+  /* Match the world's portrait aspect so the pixel grid fills the element
+     instead of sitting letterboxed in the middle of a wide canvas. */
+  aspect-ratio: 208 / 236;
+  height: min(58vh, 520px);
+  width: auto;
+  max-width: 100%;
+  margin-inline: auto;
+  image-rendering: pixelated;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ------------------------------------------------------------
+   Mobile
+   ------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .tower {
+    gap: 0.55rem;
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+
+  .shaftcanvas {
+    height: min(52vh, 440px);
+  }
+
+  .tower__potvalue {
+    font-size: 1.05rem;
+  }
+
+  .runhud {
+    top: 2rem;
+    left: 0.8rem;
+  }
+
+  .runhud__dist {
+    font-size: 1.25rem;
+  }
+}
+
+
