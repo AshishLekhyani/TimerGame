@@ -1,0 +1,842 @@
+/* ============================================================
+   Per-game visuals
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. BLIND COUNTDOWN — the dial
+   ------------------------------------------------------------ */
+
+.dial {
+  position: relative;
+  width: min(300px, 74vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.dial__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.dial__track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-width: 6;
+}
+
+.dial__arc {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+  transition: stroke 300ms ease;
+}
+
+.dial__arc[data-over='true'] {
+  stroke: var(--danger);
+  filter: drop-shadow(0 0 10px rgba(255, 84, 112, 0.6));
+}
+
+.dial__ticks line {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.dial__face {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dial__readout {
+  font-family: var(--font-num);
+  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  transition: filter 500ms ease, opacity 500ms ease, color 300ms ease;
+}
+
+.dial__readout[data-blind='true'] {
+  filter: blur(16px);
+  opacity: 0.28;
+}
+
+.dial__readout[data-over='true'] {
+  color: var(--danger);
+}
+
+.dial__caption {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.dial__target {
+  font-family: var(--font-num);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* verdict flash after each round */
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  animation: verdictIn 400ms var(--ease-spring);
+}
+
+@keyframes verdictIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+}
+
+.verdict__grade {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.verdict__delta {
+  font-family: var(--font-num);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+
+/* ------------------------------------------------------------
+   2. REACTION RUSH — the pad
+   ------------------------------------------------------------ */
+
+.pad {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  transition: background 90ms linear;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.pad[data-phase='idle'] {
+  background: transparent;
+}
+.pad[data-phase='wait'] {
+  background: radial-gradient(80% 70% at 50% 50%, #3a1020, #170812);
+}
+.pad[data-phase='go'] {
+  background: radial-gradient(80% 70% at 50% 50%, #163d1d, #0a2411);
+}
+.pad[data-phase='early'] {
+  background: radial-gradient(80% 70% at 50% 50%, #4a1520, #1c0810);
+}
+.pad[data-phase='scored'] {
+  background: radial-gradient(80% 70% at 50% 50%, #101a3a, #080c1c);
+}
+
+.pad__big {
+  font-size: clamp(2rem, 9vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pad__ms {
+  font-family: var(--font-num);
+  font-size: clamp(2.8rem, 13vw, 4.2rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  animation: scorePop 460ms var(--ease-spring);
+}
+
+.pad__sub {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 34ch;
+  line-height: 1.55;
+}
+
+.pad__go {
+  animation: goFlash 320ms var(--ease-spring);
+}
+
+@keyframes goFlash {
+  from {
+    transform: scale(0.55);
+    opacity: 0.2;
+  }
+}
+
+/* per-round dots with times */
+
+.rounds {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.roundchip {
+  min-width: 62px;
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  font-family: var(--font-num);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.roundchip[data-state='pending'] {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+.roundchip[data-state='good'] {
+  color: var(--lime);
+  border-color: rgba(163, 230, 53, 0.3);
+}
+.roundchip[data-state='bad'] {
+  color: var(--danger);
+  border-color: rgba(255, 84, 112, 0.3);
+}
+
+/* ------------------------------------------------------------
+   3. CHROMA CLASH — stroop
+   ------------------------------------------------------------ */
+
+.stroop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  width: 100%;
+}
+
+.stroop__prompt {
+  padding: 0.4rem 1.1rem;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stroop__prompt b {
+  color: var(--accent);
+}
+
+.stroop__word {
+  font-size: clamp(3rem, 15vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  animation: wordIn 260ms var(--ease-spring);
+  text-shadow: 0 0 44px currentColor;
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) rotate(-2deg);
+  }
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  width: min(460px, 100%);
+}
+
+@media (max-width: 460px) {
+  .swatches {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.swatch {
+  position: relative;
+  padding: 1.1rem 0.5rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--sw);
+  color: #06060d;
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: transform 140ms var(--ease-spring), box-shadow 200ms ease, filter 160ms ease;
+}
+
+.swatch:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -10px var(--sw);
+  filter: brightness(1.08);
+}
+
+.swatch:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.swatch__key {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  font-family: var(--font-num);
+  font-size: 0.62rem;
+  font-weight: 800;
+  opacity: 0.5;
+}
+
+.swatch[data-flash='right'] {
+  animation: swRight 380ms var(--ease-out);
+}
+.swatch[data-flash='wrong'] {
+  animation: swWrong 380ms var(--ease-out);
+}
+
+@keyframes swRight {
+  40% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.28);
+  }
+}
+@keyframes swWrong {
+  25%,
+  75% {
+    transform: translateX(-7px);
+    filter: grayscale(0.8);
+  }
+  50% {
+    transform: translateX(7px);
+    filter: grayscale(0.8);
+  }
+}
+
+/* ------------------------------------------------------------
+   4. MEMORY MATRIX — the grid
+   ------------------------------------------------------------ */
+
+.matrix {
+  display: grid;
+  gap: clamp(6px, 1.6vw, 10px);
+  width: min(400px, 82vw);
+  aspect-ratio: 1;
+}
+
+.tile {
+  border-radius: clamp(8px, 2.2vw, 14px);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+  transition: transform 180ms var(--ease-spring), background 180ms ease, box-shadow 220ms ease,
+    border-color 180ms ease;
+}
+
+.tile:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--line-strong);
+  transform: scale(1.04);
+}
+
+.tile[data-state='lit'] {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 26px -2px var(--accent-glow);
+  transform: scale(1.05);
+}
+
+.tile[data-state='hit'] {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 20px -4px var(--accent-glow);
+  animation: tileHit 380ms var(--ease-spring);
+}
+
+.tile[data-state='miss'] {
+  background: var(--danger);
+  border-color: transparent;
+  animation: tileMiss 420ms var(--ease-out);
+}
+
+@keyframes tileHit {
+  40% {
+    transform: scale(1.16);
+  }
+}
+@keyframes tileMiss {
+  25%,
+  75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+.matrix[data-locked='true'] .tile {
+  cursor: default;
+}
+
+.matrix__phase {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------
+   5. BULLSEYE BLITZ — the arena
+   ------------------------------------------------------------ */
+
+.arena {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+  overflow: hidden;
+}
+
+.target {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  will-change: transform, opacity;
+  animation: targetIn 180ms var(--ease-spring);
+}
+
+@keyframes targetIn {
+  from {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+}
+
+.target__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--tc);
+  opacity: 0.55;
+}
+
+.target__core {
+  position: absolute;
+  inset: 26%;
+  border-radius: 50%;
+  background: var(--tc);
+  box-shadow: 0 0 24px -2px var(--tc);
+}
+
+.target__mid {
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  border: 2px solid var(--tc);
+  opacity: 0.32;
+}
+
+.target[data-kind='bomb'] .target__core {
+  inset: 18%;
+  animation: bombPulse 620ms ease-in-out infinite;
+}
+
+@keyframes bombPulse {
+  50% {
+    transform: scale(0.82);
+  }
+}
+
+.target[data-kind='bonus'] .target__core {
+  animation: bonusSpin 1.6s linear infinite;
+}
+
+@keyframes bonusSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pop {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--tc);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: popOut 420ms var(--ease-out) forwards;
+}
+
+@keyframes popOut {
+  from {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  to {
+    opacity: 0;
+    scale: 2.2;
+  }
+}
+
+.crosshair-note {
+  position: absolute;
+  bottom: 1rem;
+  inset-inline: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Shared: the pre-game "ready" splash inside a stage
+   ------------------------------------------------------------ */
+
+.ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+  animation: verdictIn 420ms var(--ease-out);
+}
+
+.ready__icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  margin-bottom: 0.2rem;
+}
+
+.ready__icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.ready h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.ready__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+  max-width: 42ch;
+}
+
+.ready__rule {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.ready__rule i {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-num);
+  font-size: 0.66rem;
+  font-weight: 800;
+  font-style: normal;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* countdown 3-2-1 */
+
+.gostart {
+  font-family: var(--font-num);
+  font-size: clamp(4rem, 20vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  animation: countBeat 700ms var(--ease-out);
+}
+
+@keyframes countBeat {
+  from {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------
+   6. NUMBER CHASE — the Schulte grid
+   ------------------------------------------------------------ */
+
+.chasenext {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 1.1rem 0.4rem 0.9rem;
+  border-radius: 99px;
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
+}
+
+.chasenext__label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.chasenext__num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  animation: nextPop 260ms var(--ease-spring);
+}
+
+@keyframes nextPop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.chase {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(4px, 1.2vw, 8px);
+  width: min(400px, 86vw);
+  aspect-ratio: 1;
+}
+
+.chase[data-shuffled='true'] {
+  animation: boardShuffle 420ms var(--ease-out);
+}
+
+@keyframes boardShuffle {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+  45% {
+    transform: scale(0.94) rotate(-1.5deg);
+    filter: blur(4px);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+.chasecell {
+  display: grid;
+  place-items: center;
+  border-radius: clamp(6px, 1.8vw, 11px);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: clamp(0.85rem, 3.4vw, 1.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms var(--ease-spring),
+    opacity 240ms ease, color 200ms ease;
+}
+
+.chasecell:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--line-strong);
+}
+
+.chasecell:active {
+  transform: scale(0.93);
+}
+
+.chasecell[data-done='true'] {
+  opacity: 0.24;
+  color: var(--accent);
+  border-color: transparent;
+  background: var(--accent-soft);
+}
+
+.chasecell[data-wrong='true'] {
+  background: var(--danger);
+  border-color: transparent;
+  color: #fff;
+  animation: tileMiss 400ms var(--ease-out);
+}
+
+/* ------------------------------------------------------------
+   7. SHADE SHIFT — the odd-one-out grid
+   ------------------------------------------------------------ */
+
+.shade {
+  display: grid;
+  gap: clamp(3px, 1vw, 7px);
+  width: min(400px, 84vw);
+  aspect-ratio: 1;
+  animation: shadeIn 300ms var(--ease-out);
+}
+
+@keyframes shadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.shadecell {
+  border-radius: clamp(4px, 1.4vw, 10px);
+  border: none;
+  transition: transform 120ms var(--ease-spring), box-shadow 160ms ease;
+}
+
+.shadecell:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28);
+}
+
+.shadecell:active {
+  transform: scale(0.94);
+}
+
+.shadecell[data-wrong='true'] {
+  animation: tileMiss 380ms var(--ease-out);
+  box-shadow: 0 0 0 3px var(--danger);
+}
+
+/* ------------------------------------------------------------
+   8. RAPID FIRE — true / false arithmetic
+   ------------------------------------------------------------ */
+
+.rapid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  width: 100%;
+}
+
+.rapid__prompt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rapid__eq {
+  font-size: clamp(2rem, 8.5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-align: center;
+  animation: eqIn 220ms var(--ease-spring);
+}
+
+.rapid__eq-op {
+  color: var(--accent);
+  margin-inline: 0.15em;
+}
+
+@keyframes eqIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+}
+
+.rapid__buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: min(420px, 100%);
+}
+
+.rapidbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.15rem 1rem;
+  min-height: 64px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: transform 140ms var(--ease-spring), background 180ms ease, box-shadow 200ms ease;
+}
+
+.rapidbtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.rapidbtn--yes {
+  background: rgba(47, 217, 122, 0.16);
+  border-color: rgba(47, 217, 122, 0.45);
+  color: #7ff0b0;
+}
+
+.rapidbtn--yes:hover {
+  background: rgba(47, 217, 122, 0.28);
+  box-shadow: 0 10px 26px -12px rgba(47, 217, 122, 0.9);
+  transform: translateY(-2px);
+}
+
+.rapidbtn--no {
+  background: rgba(255, 84, 112, 0.16);
+  border-color: rgba(255, 84, 112, 0.45);
+  color: #ff9aab;
+}
+
+.rapidbtn--no:hover {
+  background: rgba(255, 84, 112, 0.28);
+  box-shadow: 0 10px 26px -12px rgba(255, 84, 112, 0.9);
+  transform: translateY(-2px);
+}
+
+.rapidbtn:active {
+  transform: scale(0.96);
+}
