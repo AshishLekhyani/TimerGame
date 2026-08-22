@@ -1,0 +1,488 @@
+/* ============================================================
+   CIPHER LOCK / LOGIC CHAIN / ECHO — the deduction games
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Cipher Lock
+   ------------------------------------------------------------ */
+
+.cipher {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(460px, 100%);
+  margin-top: 1.5rem;
+}
+
+.cipher__history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  max-height: 30vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.cipherrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+  animation: rowIn 260ms var(--ease-out);
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.cipherrow__n {
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  min-width: 1.1em;
+}
+
+.cipherrow__digits {
+  display: flex;
+  gap: 0.28rem;
+  flex: 1;
+}
+
+.cipherdigit {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cipherrow__feedback {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cipherscore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cipherpip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.cipherpip--exact {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.cipherpip--near {
+  background: transparent;
+  border: 2px solid var(--ink-dim);
+}
+
+.cipherscore--exact {
+  color: var(--accent);
+}
+.cipherscore--near {
+  color: var(--ink-dim);
+}
+
+.cipherlegend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  color: var(--ink-dim);
+}
+
+.cipherlegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cipherdraft {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.cipherslot {
+  width: 46px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ink-faint);
+  transition: all 160ms var(--ease-spring);
+}
+
+.cipherslot[data-filled='true'] {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.cipherpad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  width: min(340px, 100%);
+}
+
+.cipherkey {
+  aspect-ratio: 1;
+  min-height: 46px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--glass);
+  font-size: 1.05rem;
+  font-weight: 700;
+  transition: all 140ms var(--ease-spring);
+}
+
+.cipherkey:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cipherkey:active {
+  transform: scale(0.92);
+}
+
+.cipheractions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cipherreveal {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 99px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: rgba(255, 84, 112, 0.12);
+  animation: verdictIn 380ms var(--ease-spring);
+}
+
+.cipherreveal[data-good='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 30px -6px var(--accent-glow);
+}
+
+.cipherreveal__code {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------
+   Logic Chain
+   ------------------------------------------------------------ */
+
+.chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  width: min(640px, 100%);
+  margin-top: 1.5rem;
+}
+
+.chain__tier {
+  padding: 0.28rem 0.85rem;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.chain__tier[data-t='3'] {
+  color: var(--amber);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+.chain__tier[data-t='4'] {
+  color: var(--danger);
+  border-color: rgba(255, 84, 112, 0.4);
+}
+
+.chain__terms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  animation: qIn 300ms var(--ease-out);
+}
+
+.chainterm {
+  padding: 0.6rem 0.8rem;
+  min-width: 56px;
+  text-align: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.045);
+  font-size: clamp(1rem, 3.6vw, 1.35rem);
+  font-weight: 700;
+}
+
+.chainterm--blank {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  border-style: dashed;
+  animation: blankPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes blankPulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.chain__options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.55rem;
+  width: min(420px, 100%);
+}
+
+.chainopt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 0.75rem;
+  min-height: 56px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.045);
+  font-size: 1.02rem;
+  font-weight: 700;
+  transition: transform 140ms var(--ease-spring), background 180ms ease, border-color 180ms ease,
+    opacity 220ms ease;
+}
+
+.chainopt:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.chainopt[data-state='correct'] {
+  background: rgba(47, 217, 122, 0.2);
+  border-color: #2fd97a;
+  color: #d9ffe9;
+}
+
+.chainopt[data-state='wrong'] {
+  background: rgba(255, 84, 112, 0.18);
+  border-color: var(--danger);
+  color: #ffdfe4;
+}
+
+.chainopt[data-state='dim'] {
+  opacity: 0.3;
+}
+
+.chain__rule {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-align: center;
+  animation: verdictIn 300ms var(--ease-out);
+}
+
+.chain__rule b {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------
+   Echo — dual N-back
+   ------------------------------------------------------------ */
+
+.echo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  width: 100%;
+}
+
+.echogrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(6px, 1.6vw, 10px);
+  width: min(300px, 74vw);
+  aspect-ratio: 1;
+}
+
+.echocell {
+  border-radius: clamp(8px, 2.2vw, 14px);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  transition: background 120ms ease, box-shadow 160ms ease, transform 140ms var(--ease-spring);
+}
+
+.echocell[data-on='true'] {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 30px -4px var(--accent-glow);
+  transform: scale(1.04);
+}
+
+.echoletter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(3.5rem, 16vw, 5.5rem);
+  font-weight: 800;
+  color: var(--ink);
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  mix-blend-mode: normal;
+}
+
+.echo__buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  width: min(440px, 100%);
+}
+
+.echobtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.85rem 0.75rem;
+  min-height: 64px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--glass);
+  transition: all 150ms var(--ease-out);
+}
+
+.echobtn b {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.echobtn span {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.echobtn:not(:disabled):hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.echobtn[data-marked='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 24px -8px var(--accent-glow);
+}
+
+.echobtn:disabled {
+  opacity: 0.35;
+}
+
+/* ------------------------------------------------------------
+   Mobile
+   ------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .cipher {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .cipher__history {
+    max-height: 22vh;
+  }
+
+  .cipherslot {
+    width: 40px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+
+  .cipherpad {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+  }
+
+  .cipherkey {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  .chain {
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .chain__options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.45rem;
+  }
+
+  .chainopt {
+    min-height: 52px;
+    font-size: 0.94rem;
+  }
+
+  .chainterm {
+    min-width: 46px;
+    padding: 0.5rem 0.55rem;
+  }
+
+  .echo {
+    gap: 1.1rem;
+  }
+
+  .echogrid {
+    width: min(260px, 72vw);
+  }
+
+  .echobtn {
+    min-height: 58px;
+  }
+}
